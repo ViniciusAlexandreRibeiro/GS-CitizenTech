@@ -1,0 +1,192 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classFontStyle bold
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide empty members
+set separator none
+title Guardião · Diagrama de classes 3/4 · Acesso a dados (JDBC) e infraestrutura
+left to right direction
+package br.com.fiap.dao {
+abstract class BaseDAO {
+  #abrirConexao() : Connection
+  #traduzirErro(SQLException) : GuardiaoException
+  #{static} paraTimestamp(LocalDateTime) : Timestamp
+  #{static} paraLocalDateTime(Timestamp) : LocalDateTime
+  #{static} paraLocalDate(Timestamp) : LocalDate
+}
+class EmpresaDAO {
+  +inserir(Empresa) : void
+  +listarTodos() : List<Empresa>
+  +buscarPorId(long) : Empresa
+  +atualizar(Empresa) : void
+  +excluir(long) : void
+  -mapearEmpresa(ResultSet) : Empresa
+}
+class GuardiaoDAO {
+  +inserir(Guardiao) : void
+  +listarTodos() : List<Guardiao>
+  +buscarPorId(long) : Guardiao
+  +atualizar(Guardiao) : void
+  +excluir(long) : void
+  -preencher(PreparedStatement, Guardiao) : void
+  -mapearGuardiao(ResultSet) : Guardiao
+}
+class IdosoDAO {
+  +inserir(Idoso) : void
+  +listarTodos() : List<Idoso>
+  +buscarPorId(long) : Idoso
+  +atualizar(Idoso) : void
+  +excluir(long) : void
+  +contarGuardioes() : Map<Long, Integer>
+  -preencher(PreparedStatement, Idoso) : void
+  -mapearIdoso(ResultSet) : Idoso
+}
+class PrestadorDAO {
+  -{static} SELECT : String
+  +inserir(Prestador) : void
+  +listar(Long) : List<Prestador>
+  +buscarPorId(long) : Prestador
+  +atualizar(Prestador) : void
+  +excluir(long) : void
+  -preencher(PreparedStatement, Prestador) : void
+  -mapearPrestador(ResultSet) : Prestador
+}
+class RelatorioDAO {
+  +valorProtegidoPorIdoso() : List<ValorProtegidoDto>
+  +tentativasNaPortaPorBairro() : List<TentativasBairroDto>
+  +solicitacoesPorTipo() : List<SolicitacoesPorTipoDto>
+  +tempoMedioDeResposta() : List<TempoRespostaDto>
+  +contatosRecorrentes() : List<ContatoRecorrenteDto>
+  +idososSemGuardiao() : List<IdosoSemGuardiaoDto>
+  +indicadores() : IndicadoresDto
+}
+class SolicitacaoDAO {
+  -{static} SELECT : String
+  +inserir(SolicitacaoVerificacao) : void
+  +listar(Long, Long, StatusSolicitacao) : List<SolicitacaoVerificacao>
+  +buscarPorId(long) : SolicitacaoVerificacao
+  +atualizar(SolicitacaoVerificacao) : void
+  +salvarResposta(SolicitacaoVerificacao) : void
+  +excluir(long) : void
+  +contarBloqueios(String) : int
+  -mapearSolicitacao(ResultSet) : SolicitacaoVerificacao
+}
+class VinculoDAO {
+  -{static} SELECT : String
+  +inserir(VinculoGuardiao) : void
+  +listar(Long, Long) : List<VinculoGuardiao>
+  +buscar(long, long) : VinculoGuardiao
+  +existe(long, long) : boolean
+  +contarGuardioesDoIdoso(long) : int
+  +atualizar(VinculoGuardiao) : void
+  +excluir(long, long) : void
+  -mapearVinculo(ResultSet) : VinculoGuardiao
+}
+class VisitaDAO {
+  -{static} SELECT : String
+  +inserir(Visita) : void
+  +listar(Long, StatusVisita) : List<Visita>
+  +buscarPorId(long) : Visita
+  +buscarPorCodigo(String) : Visita
+  +atualizar(Visita) : void
+  +excluir(long) : void
+  -preencher(PreparedStatement, Visita) : void
+  -mapearVisita(ResultSet) : Visita
+}
+}
+package br.com.fiap.db {
+class ConnectionFactory {
+  -{static} URL_PADRAO : String
+  -{static} config : Properties
+  +{static} getConnection() : Connection
+  -{static} carregarConfiguracao() : Properties
+  -{static} localizarArquivo() : Path
+  -{static} sobrescreverComAmbiente(Properties, String, String) : void
+  -{static} vazio(String) : boolean
+  -{static} mensagemDeConexao(SQLException) : String
+}
+}
+package br.com.fiap.exception {
+class BancoDadosException {
+}
+class EntidadeNaoEncontradaException {
+}
+abstract class GuardiaoException {
+  -status : int
+  -campo : String
+  +getStatus() : int
+  +getCampo() : String
+}
+class RegraNegocioException {
+  +{static} DADO_INVALIDO : int
+  +{static} NAO_PERMITIDO : int
+  +{static} CONFLITO : int
+}
+}
+package br.com.fiap.exception.mapper {
+class ErroInesperadoMapper {
+  +toResponse(Throwable) : Response
+  -temCausa(Throwable, Class<? extends Throwable>) : boolean
+}
+class Erros {
+  ~{static} resposta(int, String, String) : Response
+  -{static} titulo(int) : String
+}
+class GuardiaoExceptionMapper {
+  +toResponse(GuardiaoException) : Response
+}
+class WebApplicationExceptionMapper {
+  +toResponse(WebApplicationException) : Response
+}
+}
+package br.com.fiap.filter {
+class CorsFilter {
+  +filter(ContainerRequestContext, ContainerResponseContext) : void
+}
+}
+package br.com.fiap.util {
+class Contatos {
+  +{static} normalizar(String) : String
+}
+class Documentos {
+  +{static} somenteDigitos(String) : String
+  +{static} cpfValido(String) : boolean
+  +{static} cnpjValido(String) : boolean
+  +{static} mascararCpf(String) : String
+  +{static} formatarCnpj(String) : String
+  -{static} digitoCpf(String, int) : int
+  -{static} digitoCnpj(String, int[]) : int
+  -{static} todosIguais(String) : boolean
+}
+class Validador {
+  +{static} textoObrigatorio(String, String, String, int, int) : String
+  +{static} cpf(String) : String
+  +{static} cnpj(String) : String
+  +{static} telefone(String) : String
+  +{static} email(String) : String
+  +{static} dataNoPassado(LocalDate, String, String) : LocalDate
+  +{static} valorPositivo(BigDecimal, String, String) : BigDecimal
+  +{static} idObrigatorio(Long, String, String) : Long
+  +{static} opcao(Class<E>, String, String, String) : <E extends Enum<E>> E
+  -{static} primeiraMaiuscula(String) : String
+}
+}
+BaseDAO <|-- EmpresaDAO
+BaseDAO <|-- GuardiaoDAO
+BaseDAO <|-- IdosoDAO
+BaseDAO <|-- PrestadorDAO
+BaseDAO <|-- RelatorioDAO
+BaseDAO <|-- SolicitacaoDAO
+BaseDAO <|-- VinculoDAO
+BaseDAO <|-- VisitaDAO
+GuardiaoException <|-- BancoDadosException
+GuardiaoException <|-- EntidadeNaoEncontradaException
+GuardiaoException <|-- RegraNegocioException
+legend right
+Todos os DAOs herdam de BaseDAO (conexão, conversão de datas e tradução dos erros ORA).
+Erros sobem como GuardiaoException e viram JSON nos mappers.
+endlegend
+@enduml

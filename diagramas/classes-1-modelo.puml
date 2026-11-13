@@ -1,0 +1,159 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classFontStyle bold
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide empty members
+set separator none
+title Guardião · Diagrama de classes 1/4 · Modelo de domínio
+package br.com.fiap.models {
+class Empresa {
+  -id : Long
+  -nome : String
+  -cnpj : String
+  -setor : SetorEmpresa
+}
+class Guardiao {
+  -email : String
+  +getPapel() : String
+}
+class Idoso {
+  +{static} LIMITE_PIX_PADRAO : BigDecimal
+  -bairro : String
+  -dataNascimento : LocalDate
+  -limitePix : BigDecimal
+  +getPapel() : String
+  +getIdade() : int
+  +excedeLimite(BigDecimal) : boolean
+}
+abstract class Pessoa {
+  -id : Long
+  -nome : String
+  -cpf : String
+  -telefone : String
+  +{abstract} getPapel() : String
+  +getCpfMascarado() : String
+}
+class Prestador {
+  -empresa : Empresa
+  -funcao : String
+  +getPapel() : String
+}
+class SolicitacaoVerificacao {
+  -id : Long
+  -idoso : Idoso
+  -guardiaoResposta : Guardiao
+  -visita : Visita
+  -tipo : TipoSolicitacao
+  -descricao : String
+  -valor : BigDecimal
+  -contatoSuspeito : String
+  -status : StatusSolicitacao
+  -orientacao : String
+  -dataAbertura : LocalDateTime
+  -dataResposta : LocalDateTime
+  +liberar(Guardiao, String, LocalDateTime) : void
+  +bloquear(Guardiao, String, LocalDateTime) : void
+  -responder(Guardiao, String, LocalDateTime, StatusSolicitacao) : void
+  +exigeAprovacaoObrigatoria() : boolean
+  +getValorProtegido() : BigDecimal
+  +getMinutosAteResposta() : Long
+  +estaPendente() : boolean
+  +getDescricaoStatus() : String
+}
+interface Verificavel {
+  +estaPendente() : boolean
+  +getDescricaoStatus() : String
+}
+class VinculoGuardiao {
+  +{static} PRIORIDADE_MINIMA : int
+  +{static} PRIORIDADE_MAXIMA : int
+  -idoso : Idoso
+  -guardiao : Guardiao
+  -parentesco : String
+  -prioridade : int
+  -dataVinculo : LocalDate
+}
+class Visita {
+  +{static} JANELA_TOLERANCIA : Duration
+  -{static} SORTEIO : SecureRandom
+  -id : Long
+  -idoso : Idoso
+  -prestador : Prestador
+  -nomeVisitante : String
+  -dataAgendada : LocalDateTime
+  -codigo : String
+  -agendadoPor : AgendadoPor
+  -status : StatusVisita
+  +{static} gerarCodigo() : String
+  +estaNaJanela(LocalDateTime) : boolean
+  +podeSerConfirmada(LocalDateTime) : boolean
+  +confirmar() : void
+  +cancelar() : void
+  +getNomeExibicao() : String
+  +estaPendente() : boolean
+  +getDescricaoStatus() : String
+}
+}
+package br.com.fiap.models.enums {
+enum AgendadoPor {
+  EMPRESA
+  GUARDIAO
+}
+enum DecisaoGuardiao {
+  LIBERAR
+  BLOQUEAR
+}
+enum SetorEmpresa {
+  ENERGIA
+  AGUA
+  GAS
+  TELECOM
+  ENTREGA
+  OUTRO
+}
+enum StatusSolicitacao {
+  PENDENTE
+  LIBERADA
+  BLOQUEADA
+}
+enum StatusVisita {
+  AGENDADA
+  CONFIRMADA
+  CANCELADA
+}
+enum TipoSolicitacao {
+  VISITA
+  PIX
+  LIGACAO
+  LINK
+  MENSAGEM
+  -descricao : String
+  +exigeValor() : boolean
+}
+}
+Empresa --> SetorEmpresa : setor
+Pessoa <|-- Guardiao
+Pessoa <|-- Idoso
+Pessoa <|-- Prestador
+Prestador --> Empresa : empresa
+SolicitacaoVerificacao --> Guardiao : guardiaoResposta
+SolicitacaoVerificacao --> Idoso : idoso
+SolicitacaoVerificacao --> StatusSolicitacao : status
+SolicitacaoVerificacao --> TipoSolicitacao : tipo
+SolicitacaoVerificacao --> Visita : visita
+Verificavel <|.. SolicitacaoVerificacao
+Verificavel <|.. Visita
+VinculoGuardiao --> Guardiao : guardiao
+VinculoGuardiao --> Idoso : idoso
+Visita --> AgendadoPor : agendadoPor
+Visita --> Idoso : idoso
+Visita --> Prestador : prestador
+Visita --> StatusVisita : status
+legend right
+Getters e setters simples dos atributos foram omitidos.
+Pessoa é abstrata; Visita e SolicitacaoVerificacao implementam Verificavel.
+endlegend
+@enduml

@@ -1,0 +1,202 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classFontStyle bold
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide empty members
+set separator none
+title Guardião · Diagrama de classes 2/4 · Resources (API REST) e services (regras)
+left to right direction
+package br.com.fiap.resource {
+class EmpresaResource {
+  -service : EmpresaService
+  +cadastrar(CadastroEmpresaDto, UriInfo) : Response
+  +listar() : List<DetalhesEmpresaDto>
+  +buscar(long) : DetalhesEmpresaDto
+  +atualizar(long, CadastroEmpresaDto) : DetalhesEmpresaDto
+  +remover(long) : Response
+}
+class GuardiaoResource {
+  -service : GuardiaoService
+  +cadastrar(CadastroGuardiaoDto, UriInfo) : Response
+  +listar() : List<DetalhesGuardiaoDto>
+  +buscar(long) : DetalhesGuardiaoDto
+  +atualizar(long, CadastroGuardiaoDto) : DetalhesGuardiaoDto
+  +remover(long) : Response
+}
+class IdosoResource {
+  -service : IdosoService
+  +cadastrar(CadastroIdosoDto, UriInfo) : Response
+  +listar() : List<DetalhesIdosoDto>
+  +buscar(long) : DetalhesIdosoDto
+  +atualizar(long, CadastroIdosoDto) : DetalhesIdosoDto
+  +remover(long) : Response
+}
+class PrestadorResource {
+  -service : PrestadorService
+  +cadastrar(CadastroPrestadorDto, UriInfo) : Response
+  +listar(Long) : List<DetalhesPrestadorDto>
+  +buscar(long) : DetalhesPrestadorDto
+  +atualizar(long, CadastroPrestadorDto) : DetalhesPrestadorDto
+  +remover(long) : Response
+}
+class RelatorioResource {
+  -service : RelatorioService
+  +indicadores() : IndicadoresDto
+  +valorProtegido() : List<ValorProtegidoDto>
+  +portaPorBairro() : List<TentativasBairroDto>
+  +porTipo() : List<SolicitacoesPorTipoDto>
+  +tempoResposta() : List<TempoRespostaDto>
+  +contatosRecorrentes() : List<ContatoRecorrenteDto>
+  +idososSemGuardiao() : List<IdosoSemGuardiaoDto>
+}
+class SolicitacaoResource {
+  -service : SolicitacaoService
+  +abrir(CadastroSolicitacaoDto, UriInfo) : Response
+  +listar(Long, Long, String) : List<DetalhesSolicitacaoDto>
+  +bloqueios(String) : BloqueiosContatoDto
+  +buscar(long) : DetalhesSolicitacaoDto
+  +atualizar(long, CadastroSolicitacaoDto) : DetalhesSolicitacaoDto
+  +responder(long, RespostaSolicitacaoDto) : DetalhesSolicitacaoDto
+  +remover(long) : Response
+}
+class StatusResource {
+  +inicio() : Map<String, String>
+  +status() : Map<String, String>
+}
+class VinculoResource {
+  -service : VinculoService
+  +vincular(VinculoDto) : Response
+  +listar(Long, Long) : List<DetalhesVinculoDto>
+  +buscar(long, long) : DetalhesVinculoDto
+  +atualizar(long, long, VinculoDto) : DetalhesVinculoDto
+  +remover(long, long) : Response
+}
+class VisitaResource {
+  -service : VisitaService
+  +agendar(CadastroVisitaDto, UriInfo) : Response
+  +listar(Long, String) : List<DetalhesVisitaDto>
+  +buscar(long) : DetalhesVisitaDto
+  +atualizar(long, CadastroVisitaDto) : DetalhesVisitaDto
+  +remover(long) : Response
+  +conferir(ConferenciaVisitaDto) : ResultadoConferenciaDto
+}
+}
+package br.com.fiap.service {
+class EmpresaService {
+  -empresaDao : EmpresaDAO
+  +cadastrar(CadastroEmpresaDto) : DetalhesEmpresaDto
+  +listar() : List<DetalhesEmpresaDto>
+  +buscar(long) : DetalhesEmpresaDto
+  +atualizar(long, CadastroEmpresaDto) : DetalhesEmpresaDto
+  +remover(long) : void
+  ~validar(CadastroEmpresaDto) : Empresa
+}
+class GuardiaoService {
+  -guardiaoDao : GuardiaoDAO
+  +cadastrar(CadastroGuardiaoDto) : DetalhesGuardiaoDto
+  +listar() : List<DetalhesGuardiaoDto>
+  +buscar(long) : DetalhesGuardiaoDto
+  +atualizar(long, CadastroGuardiaoDto) : DetalhesGuardiaoDto
+  +remover(long) : void
+  ~validar(CadastroGuardiaoDto) : Guardiao
+}
+class IdosoService {
+  +{static} IDADE_MINIMA : int
+  -{static} LIMITE_MAXIMO : BigDecimal
+  -idosoDao : IdosoDAO
+  -vinculoDao : VinculoDAO
+  +cadastrar(CadastroIdosoDto) : DetalhesIdosoDto
+  +listar() : List<DetalhesIdosoDto>
+  +buscar(long) : DetalhesIdosoDto
+  +atualizar(long, CadastroIdosoDto) : DetalhesIdosoDto
+  +remover(long) : void
+  ~validar(CadastroIdosoDto) : Idoso
+}
+class PrestadorService {
+  -prestadorDao : PrestadorDAO
+  -empresaDao : EmpresaDAO
+  +cadastrar(CadastroPrestadorDto) : DetalhesPrestadorDto
+  +listar(Long) : List<DetalhesPrestadorDto>
+  +buscar(long) : DetalhesPrestadorDto
+  +atualizar(long, CadastroPrestadorDto) : DetalhesPrestadorDto
+  +remover(long) : void
+  ~validar(CadastroPrestadorDto) : Prestador
+}
+class RelatorioService {
+  -relatorioDao : RelatorioDAO
+  +indicadores() : IndicadoresDto
+  +valorProtegido() : List<ValorProtegidoDto>
+  +portaPorBairro() : List<TentativasBairroDto>
+  +porTipo() : List<SolicitacoesPorTipoDto>
+  +tempoResposta() : List<TempoRespostaDto>
+  +contatosRecorrentes() : List<ContatoRecorrenteDto>
+  +idososSemGuardiao() : List<IdosoSemGuardiaoDto>
+}
+class SolicitacaoService {
+  -solicitacaoDao : SolicitacaoDAO
+  -idosoDao : IdosoDAO
+  -guardiaoDao : GuardiaoDAO
+  -vinculoDao : VinculoDAO
+  +abrir(CadastroSolicitacaoDto) : DetalhesSolicitacaoDto
+  +listar(Long, Long, String) : List<DetalhesSolicitacaoDto>
+  +buscar(long) : DetalhesSolicitacaoDto
+  +atualizar(long, CadastroSolicitacaoDto) : DetalhesSolicitacaoDto
+  +responder(long, RespostaSolicitacaoDto) : DetalhesSolicitacaoDto
+  +remover(long) : void
+  +bloqueiosDoContato(String) : BloqueiosContatoDto
+  -preencherDados(SolicitacaoVerificacao, CadastroSolicitacaoDto) : void
+  -detalhar(SolicitacaoVerificacao) : DetalhesSolicitacaoDto
+}
+class VinculoService {
+  +{static} MAXIMO_GUARDIOES : int
+  -vinculoDao : VinculoDAO
+  -idosoDao : IdosoDAO
+  -guardiaoDao : GuardiaoDAO
+  +vincular(VinculoDto) : DetalhesVinculoDto
+  +listar(Long, Long) : List<DetalhesVinculoDto>
+  +buscar(long, long) : DetalhesVinculoDto
+  +atualizar(long, long, VinculoDto) : DetalhesVinculoDto
+  +remover(long, long) : void
+  ~validarDados(VinculoDto) : void
+}
+class VisitaService {
+  -{static} FORMATO : DateTimeFormatter
+  -{static} TENTATIVAS_CODIGO : int
+  -visitaDao : VisitaDAO
+  -idosoDao : IdosoDAO
+  -prestadorDao : PrestadorDAO
+  -vinculoDao : VinculoDAO
+  -solicitacaoDao : SolicitacaoDAO
+  +agendar(CadastroVisitaDto) : DetalhesVisitaDto
+  +listar(Long, String) : List<DetalhesVisitaDto>
+  +buscar(long) : DetalhesVisitaDto
+  +atualizar(long, CadastroVisitaDto) : DetalhesVisitaDto
+  +remover(long) : void
+  +conferir(ConferenciaVisitaDto) : ResultadoConferenciaDto
+  -negar(Idoso, Visita, String, String, LocalDateTime) : ResultadoConferenciaDto
+  -preencher(Visita, CadastroVisitaDto) : void
+  -gerarCodigoUnico() : String
+}
+}
+package br.com.fiap {
+class Main {
+  +{static} BASE_URI : String
+  +{static} startServer() : HttpServer
+  +{static} main(String[]) : void
+}
+}
+EmpresaResource --> EmpresaService : service
+GuardiaoResource --> GuardiaoService : service
+IdosoResource --> IdosoService : service
+PrestadorResource --> PrestadorService : service
+RelatorioResource --> RelatorioService : service
+SolicitacaoResource --> SolicitacaoService : service
+VinculoResource --> VinculoService : service
+VisitaResource --> VisitaService : service
+legend right
+Cada Resource usa um Service, que concentra as regras de negócio e chama os DAOs (diagrama 3/4).
+endlegend
+@enduml

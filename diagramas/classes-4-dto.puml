@@ -1,0 +1,225 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam classFontStyle bold
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide empty members
+set separator none
+title Guardião · Diagrama de classes 4/4 · DTOs (entrada e saída da API)
+package br.com.fiap.dto {
+class BloqueiosContatoDto <<record>> {
+  -contato : String
+  -bloqueios : int
+}
+class CadastroEmpresaDto {
+  -nome : String
+  -cnpj : String
+  -setor : String
+}
+class CadastroGuardiaoDto {
+  -nome : String
+  -cpf : String
+  -telefone : String
+  -email : String
+}
+class CadastroIdosoDto {
+  -nome : String
+  -cpf : String
+  -telefone : String
+  -bairro : String
+  -dataNascimento : LocalDate
+  -limitePix : BigDecimal
+}
+class CadastroPrestadorDto {
+  -idEmpresa : Long
+  -nome : String
+  -cpf : String
+  -funcao : String
+}
+class CadastroSolicitacaoDto {
+  -idIdoso : Long
+  -tipo : String
+  -descricao : String
+  -valor : BigDecimal
+  -contatoSuspeito : String
+}
+class CadastroVisitaDto {
+  -idIdoso : Long
+  -idPrestador : Long
+  -nomeVisitante : String
+  -dataAgendada : LocalDateTime
+  -agendadoPor : String
+  -status : String
+}
+class ConferenciaVisitaDto {
+  -idIdoso : Long
+  -codigo : String
+}
+class DetalhesEmpresaDto <<record>> {
+  -id : Long
+  -nome : String
+  -cnpj : String
+  -setor : String
+  +{static} de(Empresa) : DetalhesEmpresaDto
+}
+class DetalhesGuardiaoDto <<record>> {
+  -id : Long
+  -nome : String
+  -cpfMascarado : String
+  -telefone : String
+  -email : String
+  +{static} de(Guardiao) : DetalhesGuardiaoDto
+}
+class DetalhesIdosoDto <<record>> {
+  -id : Long
+  -nome : String
+  -cpfMascarado : String
+  -telefone : String
+  -bairro : String
+  -dataNascimento : LocalDate
+  -idade : int
+  -limitePix : BigDecimal
+  -qtGuardioes : int
+  +{static} de(Idoso, int) : DetalhesIdosoDto
+}
+class DetalhesPrestadorDto <<record>> {
+  -id : Long
+  -nome : String
+  -cpfMascarado : String
+  -funcao : String
+  -idEmpresa : Long
+  -nomeEmpresa : String
+  +{static} de(Prestador) : DetalhesPrestadorDto
+}
+class DetalhesSolicitacaoDto <<record>> {
+  -id : Long
+  -idIdoso : Long
+  -nomeIdoso : String
+  -bairro : String
+  -tipo : String
+  -descricaoTipo : String
+  -descricao : String
+  -valor : BigDecimal
+  -contatoSuspeito : String
+  -status : String
+  -descricaoStatus : String
+  -orientacao : String
+  -idGuardiaoResposta : Long
+  -nomeGuardiaoResposta : String
+  -dataAbertura : LocalDateTime
+  -dataResposta : LocalDateTime
+  -limitePix : BigDecimal
+  -aprovacaoObrigatoria : boolean
+  -idVisita : Long
+  -bloqueiosDoContato : Integer
+  +{static} de(SolicitacaoVerificacao) : DetalhesSolicitacaoDto
+  +{static} de(SolicitacaoVerificacao, Integer) : DetalhesSolicitacaoDto
+}
+class DetalhesVinculoDto <<record>> {
+  -idIdoso : Long
+  -nomeIdoso : String
+  -idGuardiao : Long
+  -nomeGuardiao : String
+  -telefoneGuardiao : String
+  -parentesco : String
+  -prioridade : int
+  -dataVinculo : LocalDate
+  +{static} de(VinculoGuardiao) : DetalhesVinculoDto
+}
+class DetalhesVisitaDto <<record>> {
+  -id : Long
+  -idIdoso : Long
+  -nomeIdoso : String
+  -bairro : String
+  -idPrestador : Long
+  -visitante : String
+  -funcao : String
+  -empresa : String
+  -dataAgendada : LocalDateTime
+  -codigo : String
+  -agendadoPor : String
+  -status : String
+  -descricaoStatus : String
+  +{static} de(Visita) : DetalhesVisitaDto
+}
+class ErroDto <<record>> {
+  -status : int
+  -erro : String
+  -mensagem : String
+  -campo : String
+}
+class RespostaSolicitacaoDto {
+  -idGuardiao : Long
+  -decisao : String
+  -orientacao : String
+}
+class ResultadoConferenciaDto <<record>> {
+  -resultado : String
+  -mensagem : String
+  -visitante : String
+  -funcao : String
+  -empresa : String
+  -horario : LocalDateTime
+  -idSolicitacao : Long
+  -guardioesAvisados : List<String>
+  +{static} confirmada(DetalhesVisitaDto) : ResultadoConferenciaDto
+  +{static} negada(String, Long, List<String>) : ResultadoConferenciaDto
+}
+class VinculoDto {
+  -idIdoso : Long
+  -idGuardiao : Long
+  -parentesco : String
+  -prioridade : Integer
+}
+}
+package br.com.fiap.dto.relatorio {
+class ContatoRecorrenteDto <<record>> {
+  -contato : String
+  -tipo : String
+  -qtIdosos : int
+  -qtBloqueios : int
+  -ultimoUso : LocalDate
+}
+class IdosoSemGuardiaoDto <<record>> {
+  -id : Long
+  -nome : String
+  -bairro : String
+}
+class IndicadoresDto <<record>> {
+  -valorProtegido : BigDecimal
+  -golpesEvitados : int
+  -tentativasNaPorta : int
+  -minutosMedioResposta : double
+  -idososProtegidos : int
+  -idososSemGuardiao : int
+  -pendentes : int
+}
+class SolicitacoesPorTipoDto <<record>> {
+  -tipo : String
+  -total : int
+  -bloqueadas : int
+  -liberadas : int
+  -pendentes : int
+}
+class TempoRespostaDto <<record>> {
+  -guardiao : String
+  -qtRespostas : int
+  -minutosMedios : double
+}
+class TentativasBairroDto <<record>> {
+  -bairro : String
+  -qtTentativas : int
+}
+class ValorProtegidoDto <<record>> {
+  -idoso : String
+  -qtBloqueios : int
+  -valorProtegido : BigDecimal
+}
+}
+legend right
+Classes Cadastro*/Vinculo/Resposta/Conferencia: entrada (JSON → Java), getters e setters omitidos.
+Records Detalhes*/relatório: saída (Java → JSON).
+endlegend
+@enduml

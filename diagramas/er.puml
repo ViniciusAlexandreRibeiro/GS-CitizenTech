@@ -1,0 +1,98 @@
+@startuml
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide circle
+title Guardião · Diagrama entidade-relacionamento (Oracle)
+
+entity "T_IDOSO" as idoso {
+  * ID : NUMBER(10) <<PK>>
+  --
+  * NOME : VARCHAR2(80)
+  * CPF : VARCHAR2(11) <<UNIQUE, CHECK>>
+  * TELEFONE : VARCHAR2(11)
+  * BAIRRO : VARCHAR2(60)
+  * DATA_NASCIMENTO : DATE
+  * LIMITE_PIX : NUMBER(10,2) <<CHECK>>
+}
+
+entity "T_GUARDIAO" as guardiao {
+  * ID : NUMBER(10) <<PK>>
+  --
+  * NOME : VARCHAR2(80)
+  * CPF : VARCHAR2(11) <<UNIQUE, CHECK>>
+  * TELEFONE : VARCHAR2(11)
+  * EMAIL : VARCHAR2(100) <<UNIQUE>>
+}
+
+entity "T_VINCULO\n(associativa N:N)" as vinculo #E8F3EC {
+  * ID_IDOSO : NUMBER(10) <<PK, FK>>
+  * ID_GUARDIAO : NUMBER(10) <<PK, FK>>
+  --
+  * PARENTESCO : VARCHAR2(30)
+  * PRIORIDADE : NUMBER(1) <<CHECK 1..5>>
+  * DATA_VINCULO : DATE
+}
+
+entity "T_EMPRESA" as empresa {
+  * ID : NUMBER(10) <<PK>>
+  --
+  * NOME : VARCHAR2(80)
+  * CNPJ : VARCHAR2(14) <<UNIQUE, CHECK>>
+  * SETOR : VARCHAR2(20) <<CHECK>>
+}
+
+entity "T_PRESTADOR" as prestador {
+  * ID : NUMBER(10) <<PK>>
+  --
+  * ID_EMPRESA : NUMBER(10) <<FK>>
+  * NOME : VARCHAR2(80)
+  * CPF : VARCHAR2(11) <<UNIQUE, CHECK>>
+  * FUNCAO : VARCHAR2(50)
+}
+
+entity "T_VISITA" as visita {
+  * ID : NUMBER(10) <<PK>>
+  --
+  * ID_IDOSO : NUMBER(10) <<FK>>
+  ID_PRESTADOR : NUMBER(10) <<FK>>
+  NOME_VISITANTE : VARCHAR2(80)
+  * DATA_AGENDADA : DATE
+  * CODIGO : VARCHAR2(6) <<UNIQUE, CHECK>>
+  * AGENDADO_POR : VARCHAR2(10) <<CHECK>>
+  * STATUS : VARCHAR2(12) <<CHECK>>
+}
+
+entity "T_SOLICITACAO" as solicitacao {
+  * ID : NUMBER(10) <<PK>>
+  --
+  * ID_IDOSO : NUMBER(10) <<FK>>
+  ID_GUARDIAO_RESPOSTA : NUMBER(10) <<FK>>
+  ID_VISITA : NUMBER(10) <<FK>>
+  * TIPO : VARCHAR2(10) <<CHECK>>
+  * DESCRICAO : VARCHAR2(400)
+  VALOR : NUMBER(10,2) <<CHECK>>
+  CONTATO_SUSPEITO : VARCHAR2(150)
+  * STATUS : VARCHAR2(10) <<CHECK>>
+  ORIENTACAO : VARCHAR2(400)
+  * DATA_ABERTURA : DATE
+  DATA_RESPOSTA : DATE
+}
+
+idoso ||--o{ vinculo : "é protegido por"
+guardiao ||--o{ vinculo : "protege"
+empresa ||--o{ prestador : "emprega"
+idoso ||--o{ visita : "recebe"
+prestador |o--o{ visita : "realiza"
+idoso ||--o{ solicitacao : "abre"
+guardiao |o--o{ solicitacao : "responde"
+visita |o--o{ solicitacao : "gera alerta"
+
+legend right
+  * = NOT NULL
+  ||--o{ = um para muitos (FK obrigatória)
+  |o--o{ = zero ou um para muitos (FK opcional)
+  IDOSO N:N GUARDIAO pela tabela T_VINCULO
+endlegend
+@enduml
