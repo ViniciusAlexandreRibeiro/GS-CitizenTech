@@ -1,5 +1,5 @@
 # Copie este arquivo para db.properties (na mesma pasta) e preencha com seus dados.
-# O db.properties NÃO deve ir para o GitHub (já está no .gitignore).
+# O db.properties tem sua senha: não compartilhe nem envie esse arquivo (já está no .gitignore).
 db.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl
 db.usuario=rm000000
 db.senha=sua_senha
