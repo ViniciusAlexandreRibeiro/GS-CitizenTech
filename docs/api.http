@@ -1,0 +1,154 @@
+### Guardião API - requisições de exemplo
+### Abra este arquivo no IntelliJ e clique na seta verde ao lado de cada requisição.
+### (No Insomnia/Postman, copie o método, a URL e o corpo.)
+
+@api = http://localhost:8080
+
+### Situação da API e do banco
+GET {{api}}/status
+
+### ---------- IDOSOS ----------
+GET {{api}}/idosos
+
+###
+GET {{api}}/idosos/1
+
+###
+POST {{api}}/idosos
+Content-Type: application/json
+
+{
+  "nome": "Clara Mendes",
+  "cpf": "529.982.247-25",
+  "telefone": "(11) 97777-0001",
+  "bairro": "Butantã",
+  "dataNascimento": "1948-06-10",
+  "limitePix": 300
+}
+
+###
+PUT {{api}}/idosos/1
+Content-Type: application/json
+
+{
+  "nome": "Maria Aparecida Souza",
+  "cpf": "15881399803",
+  "telefone": "11987650001",
+  "bairro": "Vila Mariana",
+  "dataNascimento": "1950-03-14",
+  "limitePix": 600
+}
+
+### Erro esperado (400): CPF inválido, campo "cpf"
+POST {{api}}/idosos
+Content-Type: application/json
+
+{ "nome": "Teste", "cpf": "123.456.789-00", "telefone": "11999990000", "bairro": "Centro", "dataNascimento": "1950-01-01" }
+
+### Erro esperado (409): idoso com visitas não pode ser excluído
+DELETE {{api}}/idosos/1
+
+### ---------- GUARDIÕES ----------
+GET {{api}}/guardioes
+
+###
+POST {{api}}/guardioes
+Content-Type: application/json
+
+{ "nome": "Tiago Mendes", "cpf": "111.444.777-35", "telefone": "11966660001", "email": "tiago.mendes@exemplo.com" }
+
+### ---------- VÍNCULOS (N:N) ----------
+GET {{api}}/vinculos?idoso=1
+
+###
+POST {{api}}/vinculos
+Content-Type: application/json
+
+{ "idIdoso": 5, "idGuardiao": 2, "parentesco": "Vizinho", "prioridade": 1 }
+
+###
+PUT {{api}}/vinculos/5/2
+Content-Type: application/json
+
+{ "parentesco": "Vizinho de porta", "prioridade": 2 }
+
+###
+DELETE {{api}}/vinculos/5/2
+
+### ---------- EMPRESAS E PRESTADORES ----------
+GET {{api}}/empresas
+
+###
+GET {{api}}/prestadores?empresa=1
+
+### ---------- VISITAS ----------
+GET {{api}}/visitas?status=AGENDADA
+
+### A data precisa ser no futuro; o código de 6 dígitos volta na resposta
+POST {{api}}/visitas
+Content-Type: application/json
+
+{ "idIdoso": 1, "idPrestador": 1, "dataAgendada": "2026-12-01T14:00", "agendadoPor": "EMPRESA" }
+
+### Visita agendada pela família (sem prestador)
+POST {{api}}/visitas
+Content-Type: application/json
+
+{ "idIdoso": 1, "nomeVisitante": "Rogério (eletricista)", "dataAgendada": "2026-12-02T09:00", "agendadoPor": "GUARDIAO" }
+
+### Cancelar
+PUT {{api}}/visitas/3
+Content-Type: application/json
+
+{ "status": "CANCELADA" }
+
+### Conferência na porta - código válido (troque pelo código de uma visita de hoje)
+POST {{api}}/visitas/conferir
+Content-Type: application/json
+
+{ "idIdoso": 1, "codigo": "482913" }
+
+### Conferência na porta - código falso: resposta NEGADA e alerta para os guardiões
+POST {{api}}/visitas/conferir
+Content-Type: application/json
+
+{ "idIdoso": 2, "codigo": "000000" }
+
+### ---------- SOLICITAÇÕES (pedidos de ajuda) ----------
+GET {{api}}/solicitacoes?guardiao=1&status=PENDENTE
+
+###
+GET {{api}}/solicitacoes/bloqueios?contato=(11) 98877-1234
+
+###
+POST {{api}}/solicitacoes
+Content-Type: application/json
+
+{ "idIdoso": 1, "tipo": "PIX", "descricao": "Pediram Pix dizendo ser meu neto com número novo.", "valor": 1200, "contatoSuspeito": "(11) 98877-1234" }
+
+### Resposta do guardião (só quem é vinculado ao idoso pode responder)
+PATCH {{api}}/solicitacoes/14/resposta
+Content-Type: application/json
+
+{ "idGuardiao": 1, "decisao": "BLOQUEAR", "orientacao": "É golpe, não pague." }
+
+### ---------- RELATÓRIOS ----------
+GET {{api}}/relatorios/indicadores
+
+###
+GET {{api}}/relatorios/valor-protegido
+
+###
+GET {{api}}/relatorios/porta-por-bairro
+
+###
+GET {{api}}/relatorios/por-tipo
+
+###
+GET {{api}}/relatorios/tempo-resposta
+
+###
+GET {{api}}/relatorios/contatos-recorrentes
+
+###
+GET {{api}}/relatorios/idosos-sem-guardiao
