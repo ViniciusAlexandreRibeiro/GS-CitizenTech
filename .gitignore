@@ -1,0 +1,25 @@
+# Credenciais do banco (cada um usa o próprio RM)
+backend/db.properties
+
+# Build
+backend/target/
+frontend/node_modules/
+frontend/dist/
+
+# IDE e sistema
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Configuração local do Claude/IDE
+.claude/
+
+# Arquivo de entrega gerado
+entrega/
+
+# Material interno do grupo (não vai para o repositório)
+Plano-Projeto-Guardiao.pdf
+mockups/
+docs/Apresentacao-Guardiao.pdf
+docs/roteiro-commits.md
