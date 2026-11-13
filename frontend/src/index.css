@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-marca-50: #ecfdf3;
+  --color-marca-100: #dcfce7;
+  --color-marca-600: #15803d;
+  --color-marca-700: #166534;
+  --color-marca-800: #14532d;
+  --color-marca-900: #0f3d22;
+  --color-perigo: #b91c1c;
+  --color-alerta: #b45309;
+  --color-info: #1e3a8a;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Base de 18px: tudo em rem cresce junto, o que ajuda quem enxerga pouco. */
+html {
+  font-size: 112.5%;
+}
+
+body {
+  @apply bg-stone-50 text-stone-900 antialiased;
+}
+
+/* Foco sempre visível para quem navega pelo teclado */
+:focus-visible {
+  outline: 3px solid var(--color-marca-600);
+  outline-offset: 2px;
+}
+
+/* Itens de grid podem encolher: tabelas largas rolam dentro da própria caixa,
+   e a página nunca rola para o lado no celular. */
+.grid > * {
+  min-width: 0;
+}
+
+/* No celular, cada linha da tabela vira um cartão (sem colunas espremidas). */
+@media (max-width: 767px) {
+  .tabela-responsiva thead {
+    display: none;
+  }
+  .tabela-responsiva,
+  .tabela-responsiva tbody,
+  .tabela-responsiva tr,
+  .tabela-responsiva td {
+    display: block;
+    width: 100%;
+  }
+  .tabela-responsiva tr {
+    padding: 0.875rem 1rem;
+  }
+  .tabela-responsiva td {
+    padding: 0.125rem 0;
+  }
+  .tabela-responsiva td:last-child > div {
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+  }
+}
